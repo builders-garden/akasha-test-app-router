@@ -4,15 +4,15 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 
 import getAkashaBeams from "@/lib/akasha";
+import { GetBeamsQuery } from "@akashaorg/typings/lib/sdk/graphql-operation-types-new";
 
 export default function Home() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<GetBeamsQuery["akashaBeamIndex"]>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       const akashaBeamIndex = await getAkashaBeams();
-      setData(akashaBeamIndex?.edges ?? []);
+      setData(akashaBeamIndex);
     };
 
     fetchData();
@@ -43,12 +43,13 @@ export default function Home() {
 
         <p>Beams</p>
         <div className="flex flex-col gap-4 text-white">
-          {data &&
-            data.length &&
-            data.length > 0 &&
-            data?.map((beam: { node: { id: string; name: string } }) => (
-              <p key={beam.node.id}>{beam.node.id}</p>
-            ))}
+          {data && data.edges && data.edges.length > 0 ? (
+            data.edges?.map((beam) => (
+              <p key={beam?.node?.id}>{beam?.node?.id}</p>
+            ))
+          ) : (
+            <p>Loading...</p>
+          )}
         </div>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
